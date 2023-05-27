@@ -3,6 +3,7 @@
 exports[`CryptoExchangeSuccessComponent should render with loading props 1`] = `
 <SceneWrapper
   background="theme"
+  hasNotifications={true}
 >
   <View
     style={

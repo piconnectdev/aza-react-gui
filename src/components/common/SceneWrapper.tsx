@@ -4,7 +4,9 @@ import { Animated, ScrollView, StyleSheet, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { EdgeInsets, useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { useHandler } from '../../hooks/useHandler'
 import { THEME } from '../../theme/variables/airbitz'
+import { NotificationView, NotificationViewLayoutEvent } from '../notification/NotificationView'
 import { useTheme } from '../services/ThemeContext'
 import { KeyboardTracker } from './KeyboardTracker'
 
@@ -12,6 +14,10 @@ type BackgroundOptions =
   | 'theme' // Whatever the current theme specifies (default)
   | 'legacy' // Seprate dark header and white content areas
   | 'none' // Do not render any background elements
+
+export interface SceneWrapperLayoutEvent {
+  safeAreaBottom?: number
+}
 
 interface Props {
   // The children can either be normal React elements,
@@ -38,16 +44,30 @@ interface Props {
   // True if this scene has a bottom tab bar:
   hasTabs?: boolean
 
+  // True if we want to show the notification view:
+  hasNotifications?: boolean
+
+  // If we want the SceneWrapper's ScrollView to overscroll if it
+  // hasNotifications (defaults to true):
+  hasOverscroll?: boolean
+
   // Padding to add inside the scene border:
   padding?: number
 
   // True to make the scene scrolling (if avoidKeyboard is false):
   scroll?: boolean
+
+  // Gives overscroll required values to the child scene to ensure any
+  // scene-level components have the correct contentContainerStyle paddingBottom
+  // set. This ensures any bottom overlay components managed by SceneWrapper,
+  // such as NotificationView, don't block user taps to components in the child
+  // scene.
+  onLayout?: ((event: SceneWrapperLayoutEvent) => void) | undefined
 }
 
 /**
  * Wraps a normal stacked scene, creating a perfectly-sized box
- * that avoids the header and tab bar (if any).
+ * that avoids the header, tab bar, and notifications (if any).
  *
  * Also draws a common gradient background under the scene.
  */
@@ -59,11 +79,27 @@ export function SceneWrapper(props: Props): JSX.Element {
     children,
     hasHeader = true,
     hasTabs = false,
+    hasNotifications = false,
+    hasOverscroll = true,
     keyboardShouldPersistTaps,
     padding = 0,
-    scroll = false
+    scroll = false,
+    onLayout
   } = props
   const theme = useTheme()
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
+
+  // Handle changes to the notification view state:
+  const handleNotificationLayout = useHandler((event: NotificationViewLayoutEvent) => {
+    // 1. The overscroll for this SceneWrapper's ScrollView
+    if (hasOverscroll) setPaddingBottom(event.notificationViewHeight)
+
+    if (onLayout != null) {
+      // 2. Notify the child scene of the notification view state for scene
+      // composition-specific handling.
+      onLayout({ safeAreaBottom: event.notificationViewHeight })
+    }
+  })
 
   // Subscribe to the window size:
   const frame = useSafeAreaFrame()
@@ -74,21 +110,35 @@ export function SceneWrapper(props: Props): JSX.Element {
     const finalChildren = typeof children === 'function' ? children({ ...gap, bottom: keyboardHeight }) : children
     const scene =
       keyboardAnimation != null ? (
-        <Animated.View style={[styles.scene, { ...gap, maxHeight: keyboardAnimation, padding }]}>{finalChildren}</Animated.View>
+        <Animated.View style={[styles.scene, { ...gap, maxHeight: keyboardAnimation, padding, paddingBottom }]}>{finalChildren}</Animated.View>
       ) : scroll ? (
-        <ScrollView style={{ position: 'absolute', ...gap }} keyboardShouldPersistTaps={keyboardShouldPersistTaps} contentContainerStyle={{ padding }}>
+        <ScrollView
+          style={{ position: 'absolute', ...gap }}
+          keyboardShouldPersistTaps={keyboardShouldPersistTaps}
+          contentContainerStyle={{ padding, paddingBottom }}
+        >
           {finalChildren}
         </ScrollView>
       ) : (
-        <View style={[styles.scene, { ...gap, padding }]}>{finalChildren}</View>
+        <View style={[styles.scene, { ...gap, padding, paddingBottom }]}>{finalChildren}</View>
       )
 
+    // Render the notifications:
+    const notifications = hasNotifications ? <NotificationView onLayout={handleNotificationLayout} /> : null
+
     // Render the background, if any:
-    if (background === 'none') return scene
+    if (background === 'none')
+      return (
+        <>
+          {scene}
+          {notifications}
+        </>
+      )
     return (
       <LinearGradient colors={theme.backgroundGradientColors} end={theme.backgroundGradientEnd} start={theme.backgroundGradientStart} style={styles.gradient}>
         {background !== 'legacy' ? null : <View style={[styles.legacyBackground, { top: gap.top + bodySplit }]} />}
         {scene}
+        {notifications}
       </LinearGradient>
     )
   }

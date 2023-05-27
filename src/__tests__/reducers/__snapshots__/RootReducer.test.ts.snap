@@ -76,6 +76,7 @@ Object {
   },
   "exchangeRates": Object {},
   "isLoggedIn": false,
+  "isNotificationViewActive": false,
   "loanManager": Object {
     "lastResyncTimestamp": 0,
     "loanAccounts": Object {},
