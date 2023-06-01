@@ -18,6 +18,7 @@ export interface ButtonInfo {
   // Although multiple buttons can be spinning at once,
   // a spinning button cannot be clicked again until the promise resolves.
   onPress?: () => Promise<boolean>
+  spinner?: boolean
 }
 
 export interface ButtonModalProps<Buttons> {
@@ -64,11 +65,12 @@ export function ButtonsModal<Buttons extends { [key: string]: ButtonInfo }>(prop
   return (
     <ThemedModal warning={warning} bridge={bridge} paddingRem={1} onCancel={handleCancel}>
       <View style={containerStyle}>
-        <View style={textStyle}>
-          {title != null ? <ModalTitle>{title}</ModalTitle> : null}
-          {message != null ? <ModalMessage>{message}</ModalMessage> : null}
-          {children}
-        </View>
+        {children ?? (
+          <View style={textStyle}>
+            {title != null ? <ModalTitle>{title}</ModalTitle> : null}
+            {message != null ? <ModalMessage>{message}</ModalMessage> : null}
+          </View>
+        )}
       </View>
       <View style={buttonsStyle}>
         {Object.keys(buttons).map((key, i, arr) => {
@@ -78,7 +80,7 @@ export function ButtonsModal<Buttons extends { [key: string]: ButtonInfo }>(prop
           } else {
             defaultType = i === 0 && arr.length > 1 ? 'primary' : 'secondary'
           }
-          const { type = defaultType, label, onPress } = buttons[key]
+          const { type = defaultType, label, spinner, onPress } = buttons[key]
 
           const handlePress = (): Promise<void> | undefined => {
             if (onPress == null) {
@@ -93,7 +95,7 @@ export function ButtonsModal<Buttons extends { [key: string]: ButtonInfo }>(prop
             )
           }
 
-          return <MainButton key={key} label={label} marginRem={0.5} type={type} onPress={handlePress} />
+          return <MainButton key={key} label={label} marginRem={0.5} type={type} onPress={handlePress} spinner={spinner} />
         })}
         {closeArrow ? <ModalFooter onPress={handleCancel} /> : null}
       </View>
