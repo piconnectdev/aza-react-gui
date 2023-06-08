@@ -52,7 +52,8 @@ describe('TransactionListTop', () => {
     core: {
       account: {
         currencyWallets: { '123': fakeWallet },
-        currencyConfig: { bitcoin: fakeCurrencyConfig }
+        currencyConfig: { bitcoin: fakeCurrencyConfig },
+        watch() {}
       }
     }
   }
