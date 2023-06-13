@@ -1,7 +1,7 @@
 import { eq } from 'biggystring'
 import { EdgeCurrencyWallet, EdgeMetadata, EdgeTransaction } from 'edge-core-js'
 import * as React from 'react'
-import { ScrollView, TouchableWithoutFeedback, View } from 'react-native'
+import { TouchableWithoutFeedback, View } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import IonIcon from 'react-native-vector-icons/Ionicons'
 import { sprintf } from 'sprintf-js'
@@ -218,37 +218,33 @@ class TransactionDetailsComponent extends React.Component<Props, State> {
     const categoriesText = formatCategory(splitCategory(category))
 
     return (
-      <SceneWrapper background="theme">
-        <ScrollView>
-          <View style={styles.tilesContainer}>
-            <Tile type="editable" title={personHeader} onPress={this.openPersonInput}>
-              <View style={styles.tileRow}>
-                {thumbnailPath ? (
-                  <FastImage style={styles.tileThumbnail} source={{ uri: thumbnailPath }} />
-                ) : (
-                  <IonIcon style={styles.tileAvatarIcon} name="person" size={theme.rem(2)} />
-                )}
-                <EdgeText>{personName}</EdgeText>
-              </View>
-            </Tile>
-            <TransactionCryptoAmountTile transaction={edgeTransaction} wallet={wallet} />
-            <TransactionFiatTiles transaction={edgeTransaction} wallet={wallet} onMetadataEdit={this.onSaveTxDetails} />
-            <Tile type="editable" title={lstrings.transaction_details_category_title} onPress={this.openCategoryInput}>
-              <EdgeText style={styles.tileCategory}>{categoriesText}</EdgeText>
-            </Tile>
-            {edgeTransaction.spendTargets && <Tile type="copy" title={lstrings.transaction_details_recipient_addresses} body={recipientsAddresses} />}
-            {edgeTransaction.swapData == null ? null : <SwapDetailsTiles swapData={edgeTransaction.swapData} transaction={edgeTransaction} wallet={wallet} />}
-            {acceleratedTx == null ? null : (
-              <Tile type="touchable" title={lstrings.transaction_details_advance_details_accelerate} onPress={this.openAccelerateModel} />
+      <View style={styles.tilesContainer}>
+        <Tile type="editable" title={personHeader} onPress={this.openPersonInput}>
+          <View style={styles.tileRow}>
+            {thumbnailPath ? (
+              <FastImage style={styles.tileThumbnail} source={{ uri: thumbnailPath }} />
+            ) : (
+              <IonIcon style={styles.tileAvatarIcon} name="person" size={theme.rem(2)} />
             )}
-            <Tile type="editable" title={lstrings.transaction_details_notes_title} body={notes} onPress={this.openNotesInput} />
-            <TouchableWithoutFeedback onPress={this.openAdvancedDetails}>
-              <EdgeText style={styles.textAdvancedTransaction}>{lstrings.transaction_details_view_advanced_data}</EdgeText>
-            </TouchableWithoutFeedback>
-            <MainButton onPress={navigation.pop} label={lstrings.string_done_cap} marginRem={[0, 2, 2]} type="secondary" />
+            <EdgeText>{personName}</EdgeText>
           </View>
-        </ScrollView>
-      </SceneWrapper>
+        </Tile>
+        <TransactionCryptoAmountTile transaction={edgeTransaction} wallet={wallet} />
+        <TransactionFiatTiles transaction={edgeTransaction} wallet={wallet} onMetadataEdit={this.onSaveTxDetails} />
+        <Tile type="editable" title={lstrings.transaction_details_category_title} onPress={this.openCategoryInput}>
+          <EdgeText style={styles.tileCategory}>{categoriesText}</EdgeText>
+        </Tile>
+        {edgeTransaction.spendTargets && <Tile type="copy" title={lstrings.transaction_details_recipient_addresses} body={recipientsAddresses} />}
+        {edgeTransaction.swapData == null ? null : <SwapDetailsTiles swapData={edgeTransaction.swapData} transaction={edgeTransaction} wallet={wallet} />}
+        {acceleratedTx == null ? null : (
+          <Tile type="touchable" title={lstrings.transaction_details_advance_details_accelerate} onPress={this.openAccelerateModel} />
+        )}
+        <Tile type="editable" title={lstrings.transaction_details_notes_title} body={notes} onPress={this.openNotesInput} />
+        <TouchableWithoutFeedback onPress={this.openAdvancedDetails}>
+          <EdgeText style={styles.textAdvancedTransaction}>{lstrings.transaction_details_view_advanced_data}</EdgeText>
+        </TouchableWithoutFeedback>
+        <MainButton onPress={navigation.pop} label={lstrings.string_done_cap} marginRem={[0, 2, 2]} type="secondary" />
+      </View>
     )
   }
 }
@@ -297,13 +293,15 @@ export const TransactionDetailsScene = withWallet((props: OwnProps) => {
   const thumbnailPath = useContactThumbnail(metadata?.name)
 
   return (
-    <TransactionDetailsComponent
-      navigation={navigation}
-      route={route}
-      refreshTransaction={(transaction: EdgeTransaction) => dispatch(refreshTransactionsRequest(wallet, [transaction]))}
-      theme={theme}
-      thumbnailPath={thumbnailPath}
-      wallet={wallet}
-    />
+    <SceneWrapper scroll hasNotifications>
+      <TransactionDetailsComponent
+        navigation={navigation}
+        route={route}
+        refreshTransaction={(transaction: EdgeTransaction) => dispatch(refreshTransactionsRequest(wallet, [transaction]))}
+        theme={theme}
+        thumbnailPath={thumbnailPath}
+        wallet={wallet}
+      />
+    </SceneWrapper>
   )
 })

@@ -19,6 +19,7 @@ interface Props {
   footer?: React.ComponentType<{}> | React.ReactElement
   header?: React.ComponentType<{}> | React.ReactElement
   navigation: NavigationProp<'walletList'>
+  paddingBottom?: number
   searching: boolean
   searchText: string
 
@@ -35,6 +36,7 @@ function WalletListSwipeableComponent(props: Props) {
     footer,
     header,
     navigation,
+    paddingBottom,
     searching,
     searchText,
 
@@ -105,11 +107,13 @@ function WalletListSwipeableComponent(props: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const flatListContentOffset = React.useMemo(() => ({ x: 0, y: searching ? 0 : theme.rem(4.5) }), [searching])
   const data = React.useMemo(() => [...searchedWalletList, ...createWalletList], [searchedWalletList, createWalletList])
+  const contentContainerStyle = React.useMemo(() => ({ paddingBottom }), [paddingBottom])
 
   return (
     <FlashList
       estimatedItemSize={theme.rem(4.25)}
       contentOffset={flatListContentOffset}
+      contentContainerStyle={contentContainerStyle}
       data={data}
       keyboardShouldPersistTaps="handled"
       ListFooterComponent={footer}

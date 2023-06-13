@@ -8,7 +8,7 @@ import { lstrings } from '../../locales/strings'
 import { useDispatch, useSelector } from '../../types/reactRedux'
 import { EdgeSceneProps } from '../../types/routerTypes'
 import { CrossFade } from '../common/CrossFade'
-import { SceneWrapper } from '../common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../common/SceneWrapper'
 import { PasswordReminderModal } from '../modals/PasswordReminderModal'
 import { SortOption, WalletListSortModal } from '../modals/WalletListSortModal'
 import { Airship, showError } from '../services/AirshipInstance'
@@ -31,9 +31,14 @@ export function WalletListScene(props: Props) {
   const [sorting, setSorting] = React.useState(false)
   const [searching, setSearching] = React.useState(false)
   const [searchText, setSearchText] = React.useState('')
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
 
   const needsPasswordCheck = useSelector(state => state.ui.passwordReminder.needsPasswordCheck)
   const sortOption = useSelector(state => state.ui.settings.walletsSort)
+
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom)
+  })
 
   const handleSort = useHandler(() => {
     Airship.show<SortOption>(bridge => <WalletListSortModal sortOption={sortOption} bridge={bridge} />)
@@ -89,7 +94,7 @@ export function WalletListScene(props: Props) {
   const handlePressDone = useHandler(() => setSorting(false))
 
   return (
-    <SceneWrapper hasTabs>
+    <SceneWrapper hasTabs hasNotifications onLayout={handleSceneWrapperLayout}>
       <WiredProgressBar />
       {sorting && (
         <View style={styles.headerContainer}>
@@ -106,6 +111,7 @@ export function WalletListScene(props: Props) {
             header={header}
             footer={searching ? undefined : footer}
             navigation={navigation}
+            paddingBottom={paddingBottom}
             searching={searching}
             searchText={searchText}
             onRefresh={handleRefresh}
