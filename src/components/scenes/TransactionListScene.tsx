@@ -14,7 +14,7 @@ import { EdgeSceneProps } from '../../types/routerTypes'
 import { FlatListItem, TransactionListTx } from '../../types/types'
 import { getTokenId } from '../../util/CurrencyInfoHelpers'
 import { calculateSpamThreshold, zeroString } from '../../util/utils'
-import { SceneWrapper } from '../common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../common/SceneWrapper'
 import { withWallet } from '../hoc/withWallet'
 import { useTheme } from '../services/ThemeContext'
 import { BuyCrypto } from '../themed/BuyCrypto'
@@ -50,6 +50,7 @@ function TransactionListComponent(props: Props) {
   const [loading, setLoading] = React.useState(false)
   const [reset, setReset] = React.useState(true)
   const [searching, setSearching] = React.useState(false)
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
 
   // Selectors:
   const account = useSelector(state => state.core.account)
@@ -177,6 +178,10 @@ function TransactionListComponent(props: Props) {
     setSearching(false)
   })
 
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom)
+  })
+
   // ---------------------------------------------------------------------------
   // Renderers
   // ---------------------------------------------------------------------------
@@ -231,12 +236,15 @@ function TransactionListComponent(props: Props) {
     index
   }))
 
+  const contentContainerStyle = React.useMemo(() => ({ paddingBottom }), [paddingBottom])
+
   return (
-    <SceneWrapper hasTabs>
+    <SceneWrapper hasTabs hasNotifications onLayout={handleSceneWrapperLayout}>
       {SHOW_FLIP_INPUT_TESTER ? (
         <ExchangedFlipInputTester />
       ) : (
         <SectionList
+          contentContainerStyle={contentContainerStyle}
           contentOffset={contentOffset}
           getItemLayout={getItemLayout}
           initialNumToRender={INITIAL_TRANSACTION_BATCH_NUMBER}
