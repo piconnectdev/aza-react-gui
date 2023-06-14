@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ScrollView, View } from 'react-native'
+import { View } from 'react-native'
 import FastImage from 'react-native-fast-image'
 
 import { formatFiatString } from '../../hooks/useFiatText'
@@ -158,8 +158,8 @@ const CoinRankingDetailsSceneComponent = (props: Props) => {
   }
 
   return (
-    <SceneWrapper background="theme">
-      <ScrollView style={styles.container}>
+    <SceneWrapper background="theme" scroll hasNotifications>
+      <View style={styles.container}>
         <View style={styles.titleContainer}>
           <FastImage style={styles.icon} source={imageUrlObject} />
           <EdgeText style={styles.title}>{`${currencyName} (${currencyCodeUppercase})`}</EdgeText>
@@ -169,7 +169,7 @@ const CoinRankingDetailsSceneComponent = (props: Props) => {
           <View style={styles.column}>{renderRows(coinRankingData, COLUMN_LEFT_DATA_KEYS)}</View>
           <View style={styles.column}>{renderRows(coinRankingData, COLUMN_RIGHT_DATA_KEYS)}</View>
         </View>
-      </ScrollView>
+      </View>
     </SceneWrapper>
   )
 }
