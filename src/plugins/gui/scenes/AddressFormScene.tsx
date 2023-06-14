@@ -5,7 +5,7 @@ import { Platform, ScrollView, TouchableOpacity, View, ViewStyle } from 'react-n
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import Animated, { Easing, interpolateColor, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated'
 
-import { SceneWrapper } from '../../../components/common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../../../components/common/SceneWrapper'
 import { cacheStyles, Theme, useTheme } from '../../../components/services/ThemeContext'
 import { EdgeText } from '../../../components/themed/EdgeText'
 import { MainButton } from '../../../components/themed/MainButton'
@@ -73,6 +73,7 @@ export const AddressFormScene = React.memo((props: Props) => {
   const [isHintsDropped, setIsHintsDropped] = React.useState(false)
   const [isAnimateHintsNumChange, setIsAnimateHintsNumChange] = React.useState(false)
   const [hintHeight, setHintHeight] = React.useState<number>(0)
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
 
   const rAddressInput = React.createRef<OutlinedTextInputRef>()
 
@@ -208,6 +209,17 @@ export const AddressFormScene = React.memo((props: Props) => {
     await onSubmit(formData)
   })
 
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom)
+  })
+
+  const contentContainerStyle = React.useMemo(
+    () => ({
+      paddingBottom
+    }),
+    [paddingBottom]
+  )
+
   // The main hints dropdown animation depending on focus state of the
   // address field
   React.useEffect(() => {
@@ -249,8 +261,14 @@ export const AddressFormScene = React.memo((props: Props) => {
       key !== 'address2' && formData[key].trim() === ''
   )
   return (
-    <SceneWrapper background="theme">
-      <KeyboardAwareScrollView keyboardShouldPersistTaps="handled" extraScrollHeight={theme.rem(2.75)} enableAutomaticScroll enableOnAndroid>
+    <SceneWrapper background="theme" hasNotifications onLayout={handleSceneWrapperLayout} hasOverscroll={false}>
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="handled"
+        extraScrollHeight={theme.rem(2.75)}
+        enableAutomaticScroll
+        enableOnAndroid
+        contentContainerStyle={contentContainerStyle}
+      >
         <SceneHeader title={headerTitle} underline withTopMargin />
         <EdgeText style={styles.formSectionTitle}>{lstrings.home_address_title}</EdgeText>
         <GuiFormField

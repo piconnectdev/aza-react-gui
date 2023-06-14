@@ -16,6 +16,7 @@ import buyPluginJsonRaw from '../../constants/plugins/buyPluginList.json'
 import { customPluginRow, guiPlugins } from '../../constants/plugins/GuiPlugins'
 import sellPluginJsonRaw from '../../constants/plugins/sellPluginList.json'
 import { ENV } from '../../env'
+import { useHandler } from '../../hooks/useHandler'
 import { lstrings } from '../../locales/strings'
 import { getSyncedSettings, setSyncedSettings } from '../../modules/Core/Account/settings'
 import { checkWyreHasLinkedBank, executePlugin } from '../../plugins/gui/fiatPlugin'
@@ -30,7 +31,7 @@ import { filterGuiPluginJson } from '../../util/GuiPluginTools'
 import { fetchInfo } from '../../util/network'
 import { bestOfPlugins } from '../../util/ReferralHelpers'
 import { base58ToUuid } from '../../util/utils'
-import { SceneWrapper } from '../common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../common/SceneWrapper'
 import { CountryListModal } from '../modals/CountryListModal'
 import { TextInputModal } from '../modals/TextInputModal'
 import { Airship, showError } from '../services/AirshipInstance'
@@ -77,6 +78,7 @@ interface StateProps {
   developerModeOn: boolean
   deviceId: string
   disablePlugins: NestedDisableMap
+  contentContainerStyle: { paddingBottom?: number }
 }
 
 interface DispatchProps {
@@ -315,7 +317,7 @@ class GuiPluginList extends React.PureComponent<Props, State> {
   }
 
   render() {
-    const { accountPlugins, accountReferral, countryCode, developerModeOn, disablePlugins, theme } = this.props
+    const { accountPlugins, accountReferral, countryCode, developerModeOn, disablePlugins, theme, contentContainerStyle } = this.props
     const direction = this.getSceneDirection()
     const { buy = [], sell = [] } = this.state.buySellPlugins
     const styles = getStyles(theme)
@@ -361,7 +363,12 @@ class GuiPluginList extends React.PureComponent<Props, State> {
             </EdgeText>
           </View>
         ) : (
-          <FlashList data={plugins} renderItem={this.renderPlugin} keyExtractor={(item: GuiPluginRow) => item.pluginId + item.title} />
+          <FlashList
+            data={plugins}
+            renderItem={this.renderPlugin}
+            keyExtractor={(item: GuiPluginRow) => item.pluginId + item.title}
+            contentContainerStyle={contentContainerStyle}
+          />
         )}
       </>
     )
@@ -456,12 +463,20 @@ export const GuiPluginListScene = React.memo((props: OwnProps) => {
   const direction = props.route.name === 'pluginListSell' ? 'sell' : 'buy'
   const disablePlugins = useSelector(state => state.ui.exchangeInfo[direction].disablePlugins)
 
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
+
+  const contentContainerStyle = React.useMemo(() => ({ paddingBottom }), [paddingBottom])
+
   const updateCountryCode = (countryCode: string) => {
     dispatch(updateOneSetting({ countryCode }))
   }
 
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom)
+  })
+
   return (
-    <SceneWrapper background="theme" hasTabs>
+    <SceneWrapper background="theme" hasTabs hasNotifications onLayout={handleSceneWrapperLayout}>
       <GuiPluginList
         navigation={navigation}
         route={route}
@@ -475,6 +490,7 @@ export const GuiPluginListScene = React.memo((props: OwnProps) => {
         disablePlugins={disablePlugins}
         updateCountryCode={updateCountryCode}
         theme={theme}
+        contentContainerStyle={contentContainerStyle}
       />
     </SceneWrapper>
   )

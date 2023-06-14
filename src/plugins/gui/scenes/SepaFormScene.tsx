@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { SceneWrapper } from '../../../components/common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../../../components/common/SceneWrapper'
 import { cacheStyles, Theme, useTheme } from '../../../components/services/ThemeContext'
 import { EdgeText } from '../../../components/themed/EdgeText'
 import { MainButton } from '../../../components/themed/MainButton'
@@ -28,6 +28,7 @@ export const SepaFormScene = React.memo((props: Props) => {
   const [name, setName] = React.useState('')
   const [iban, setIban] = React.useState('')
   const [swift, setSwift] = React.useState('')
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
 
   const handleNameInput = useHandler((inputValue: string) => {
     setName(inputValue)
@@ -46,6 +47,17 @@ export const SepaFormScene = React.memo((props: Props) => {
     await onSubmit({ name, iban, swift })
   })
 
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom)
+  })
+
+  const contentContainerStyle = React.useMemo(
+    () => ({
+      paddingBottom
+    }),
+    [paddingBottom]
+  )
+
   // Initialize scene with any saved forms from disklet
   useAsyncEffect(async () => {
     const diskletFormData: SepaInfo | undefined = await getDiskletFormData<SepaInfo>(disklet, SEPA_FORM_DISKLET_NAME, asSepaInfo)
@@ -57,8 +69,14 @@ export const SepaFormScene = React.memo((props: Props) => {
   }, [])
 
   return (
-    <SceneWrapper background="theme">
-      <KeyboardAwareScrollView keyboardShouldPersistTaps="handled" extraScrollHeight={theme.rem(2.75)} enableAutomaticScroll enableOnAndroid>
+    <SceneWrapper background="theme" hasNotifications onLayout={handleSceneWrapperLayout} hasOverscroll={false}>
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="handled"
+        extraScrollHeight={theme.rem(2.75)}
+        enableAutomaticScroll
+        enableOnAndroid
+        contentContainerStyle={contentContainerStyle}
+      >
         <SceneHeader title={headerTitle} underline withTopMargin />
         <EdgeText style={styles.formSectionTitle}>{lstrings.bank_info_title}</EdgeText>
         <GuiFormField fieldType="name" value={name} label={lstrings.form_field_title_account_owner} onChangeText={handleNameInput} autofocus />
