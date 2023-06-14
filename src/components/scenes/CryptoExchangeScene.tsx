@@ -247,7 +247,7 @@ export class CryptoExchangeComponent extends React.Component<Props, State> {
     const showNext = this.props.fromCurrencyCode !== '' && this.props.toCurrencyCode !== '' && !!parseFloat(primaryNativeAmount)
     if (!showNext) return null
     if (this.checkExceedsAmount()) return null
-    return <MainButton label={lstrings.string_next_capitalized} type="secondary" marginRem={[1.5, 0, 0]} paddingRem={[0.5, 2.3]} onPress={this.handleNext} />
+    return <MainButton label={lstrings.string_next_capitalized} type="secondary" marginRem={[1.5, 0, 1.5]} paddingRem={[0.5, 2.3]} onPress={this.handleNext} />
   }
 
   renderAlert = () => {
@@ -333,13 +333,8 @@ export class CryptoExchangeComponent extends React.Component<Props, State> {
 
     return (
       <>
-        <SceneHeader title={lstrings.title_exchange} underline withTopMargin />
-        <KeyboardAwareScrollView
-          style={styles.mainScrollView}
-          keyboardShouldPersistTaps="always"
-          contentContainerStyle={styles.scrollViewContentContainer}
-          extraScrollHeight={theme.rem(5)}
-        >
+        <SceneHeader title={lstrings.title_exchange} underline />
+        <KeyboardAwareScrollView style={styles.mainScrollView} keyboardShouldPersistTaps="always" contentContainerStyle={styles.scrollViewContentContainer}>
           <LineTextDivider title={lstrings.fragment_send_from_label} lowerCased />
           <CryptoExchangeFlipInputWrapper
             walletId={this.props.fromWalletId}
@@ -387,9 +382,6 @@ const getStyles = cacheStyles((theme: Theme) => ({
   scrollViewContentContainer: {
     alignItems: 'center',
     paddingTop: theme.rem(0.5)
-  },
-  spinner: {
-    marginVertical: theme.rem(1.5)
   }
 }))
 
@@ -474,7 +466,7 @@ export const CryptoExchangeScene = (props: OwnProps) => {
   })
 
   return (
-    <SceneWrapper>
+    <SceneWrapper hasNotifications>
       <CryptoExchangeComponent
         route={route}
         onSelectWallet={handleSelectWallet}
