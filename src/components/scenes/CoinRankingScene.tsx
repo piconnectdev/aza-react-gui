@@ -13,7 +13,7 @@ import { EdgeSceneProps } from '../../types/routerTypes'
 import { FlatListItem } from '../../types/types'
 import { debugLog, enableDebugLogType, LOG_COINRANK } from '../../util/logger'
 import { fetchRates } from '../../util/network'
-import { SceneWrapper } from '../common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../common/SceneWrapper'
 import { CoinRankRow } from '../data/row/CoinRankRow'
 import { showError } from '../services/AirshipInstance'
 import { cacheStyles, Theme, useTheme } from '../services/ThemeContext'
@@ -63,6 +63,15 @@ const CoinRankingComponent = (props: Props) => {
   const [searching, setSearching] = useState<boolean>(false)
   const [percentChangeTimeFrame, setPercentChangeTimeFrame] = useState<PercentChangeTimeFrame>('hours24')
   const [assetSubText, setPriceSubText] = useState<AssetSubText>('marketCap')
+  const [paddingBottom, setPaddingBottom] = React.useState<number | undefined>(undefined)
+
+  const contentContainerStyle = React.useMemo(
+    () => ({
+      paddingBottom
+    }),
+    [paddingBottom]
+  )
+
   const extraData = React.useMemo(() => ({ assetSubText, lastUsedFiat, percentChangeTimeFrame }), [assetSubText, lastUsedFiat, percentChangeTimeFrame])
 
   const { coinRankingDatas } = coinRanking
@@ -124,6 +133,10 @@ const CoinRankingComponent = (props: Props) => {
     if (searchText === '') {
       setSearching(false)
     }
+  })
+
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom)
   })
 
   React.useEffect(() => {
@@ -197,7 +210,7 @@ const CoinRankingComponent = (props: Props) => {
   const assetSubTextString = assetSubTextStrings[assetSubText]
 
   return (
-    <SceneWrapper background="theme" hasTabs>
+    <SceneWrapper background="theme" hasTabs hasNotifications onLayout={handleSceneWrapperLayout} hasOverscroll={false}>
       <View style={styles.searchContainer}>
         <View style={styles.searchTextInputContainer}>
           <OutlinedTextInput
@@ -241,6 +254,7 @@ const CoinRankingComponent = (props: Props) => {
         renderItem={renderItem}
         onEndReachedThreshold={1}
         onEndReached={handleEndReached}
+        contentContainerStyle={contentContainerStyle}
       />
     </SceneWrapper>
   )
