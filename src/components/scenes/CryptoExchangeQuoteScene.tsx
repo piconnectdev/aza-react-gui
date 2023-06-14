@@ -1,7 +1,7 @@
 import { div, gte } from 'biggystring'
 import { EdgeAccount } from 'edge-core-js/types'
 import * as React from 'react'
-import { ScrollView, TouchableOpacity, View } from 'react-native'
+import { ScrollView, TouchableOpacity } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import IonIcon from 'react-native-vector-icons/Ionicons'
 
@@ -111,7 +111,7 @@ export class CryptoExchangeQuoteScreenComponent extends React.Component<Props, S
     const showFeeWarning = gte(feePercent, '0.05')
     const styles = getStyles(theme)
     return (
-      <SceneWrapper background="theme">
+      <SceneWrapper background="theme" hasNotifications>
         <SceneHeader title={lstrings.title_exchange} underline withTopMargin />
         <ScrollView contentContainerStyle={styles.container}>
           <LineTextDivider title={lstrings.fragment_send_from_label} lowerCased />
@@ -156,7 +156,6 @@ export class CryptoExchangeQuoteScreenComponent extends React.Component<Props, S
           )}
           <Slider parentStyle={styles.slider} onSlidingComplete={this.doShift} disabled={pending} showSpinner={pending} />
           {this.renderTimer()}
-          <View style={styles.spacer} />
         </ScrollView>
       </SceneWrapper>
     )
@@ -184,7 +183,8 @@ const getStyles = cacheStyles((theme: Theme) => ({
     alignItems: 'center'
   },
   slider: {
-    marginTop: theme.rem(2.5)
+    marginTop: theme.rem(2.5),
+    marginBottom: theme.rem(2)
   },
   spacer: {
     height: theme.rem(8)
