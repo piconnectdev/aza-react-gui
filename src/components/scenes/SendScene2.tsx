@@ -10,7 +10,7 @@ import {
   EdgeTransaction
 } from 'edge-core-js'
 import * as React from 'react'
-import { ActivityIndicator, Alert, TextInput, View } from 'react-native'
+import { ActivityIndicator, Alert, TextInput, View, ViewStyle } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { sprintf } from 'sprintf-js'
 
@@ -37,7 +37,7 @@ import { getWalletName } from '../../util/CurrencyWalletHelpers'
 import { logActivity } from '../../util/logger'
 import { convertTransactionFeeToDisplayFee, DECIMAL_PRECISION } from '../../util/utils'
 import { WarningCard } from '../cards/WarningCard'
-import { SceneWrapper } from '../common/SceneWrapper'
+import { SceneWrapper, SceneWrapperLayoutEvent } from '../common/SceneWrapper'
 import { ButtonsModal } from '../modals/ButtonsModal'
 import { FlipInputModal2, FlipInputModalRef, FlipInputModalResult } from '../modals/FlipInputModal2'
 import { InsufficientFeesModal } from '../modals/InsufficientFeesModal'
@@ -135,6 +135,7 @@ const SendComponent = (props: Props) => {
   } = route.params
 
   const initExpireDate = isoExpireDate != null ? new Date(isoExpireDate) : undefined
+  const [paddingBottom, setPaddingBottom] = React.useState<number>(0)
   const [processingAmountChanged, setProcessingAmountChanged] = React.useState<boolean>(false)
   const [walletId, setWalletId] = useState<string>(initWalletId)
   const [spendInfo, setSpendInfo] = useState<EdgeSpendInfo>(initSpendInfo ?? { spendTargets: [{}] })
@@ -172,6 +173,25 @@ const SendComponent = (props: Props) => {
   const parentDisplayDenom = useDisplayDenom(pluginId, currencyWallets[walletId].currencyInfo.currencyCode)
   const parentExchangeDenom = useExchangeDenom(pluginId, currencyWallets[walletId].currencyInfo.currencyCode)
 
+  const scrollContentContainerStyle = React.useMemo<ViewStyle>(
+    () => ({
+      paddingBottom: theme.rem(6) + paddingBottom
+    }),
+    [theme, paddingBottom]
+  )
+
+  const footerStyle = React.useMemo<ViewStyle>(
+    () => ({
+      width: '100%',
+      marginBottom: theme.rem(2) + (paddingBottom ? paddingBottom - theme.rem(0.75) : 0),
+      justifyContent: 'center',
+      alignItems: 'center',
+      position: 'absolute',
+      bottom: 0
+    }),
+    [theme, paddingBottom]
+  )
+
   spendInfo.tokenId = tokenId
 
   // TODO: Fix currency plugins that implement getMaxSpendable to not look at the currencyCode
@@ -184,6 +204,10 @@ const SendComponent = (props: Props) => {
     }
     initialMount.current = false
   }
+
+  const handleSceneWrapperLayout = useHandler((event: SceneWrapperLayoutEvent) => {
+    setPaddingBottom(event.safeAreaBottom ?? 0)
+  })
 
   const handleChangeAddress =
     (spendTarget: EdgeSpendTarget) =>
@@ -952,8 +976,8 @@ const SendComponent = (props: Props) => {
     disabledText = lstrings.spending_limits_enter_pin
   }
   return (
-    <SceneWrapper background="theme">
-      <KeyboardAwareScrollView contentContainerStyle={styles.contentContainerStyle} extraScrollHeight={theme.rem(2.75)} enableOnAndroid>
+    <SceneWrapper background="theme" hasNotifications hasOverscroll={false} onLayout={handleSceneWrapperLayout}>
+      <KeyboardAwareScrollView contentContainerStyle={scrollContentContainerStyle} extraScrollHeight={theme.rem(2.75)} enableOnAndroid>
         {renderSelectedWallet()}
         {renderAddressAmountPairs()}
         {renderAddAddress()}
@@ -967,7 +991,7 @@ const SendComponent = (props: Props) => {
         {renderAuthentication()}
         {renderScamWarning()}
       </KeyboardAwareScrollView>
-      <View style={styles.footer}>
+      <View style={footerStyle}>
         {showSlider && <SafeSlider disabledText={disabledText} onSlidingComplete={handleSliderComplete} disabled={disableSlider} />}
       </View>
     </SceneWrapper>
@@ -982,15 +1006,6 @@ const getStyles = cacheStyles((theme: Theme) => ({
   },
   calcFeeSpinner: {
     marginLeft: theme.rem(1)
-  },
-  contentContainerStyle: { paddingBottom: theme.rem(6) },
-  footer: {
-    width: '100%',
-    marginBottom: theme.rem(2),
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 0
   },
   pinContainer: {
     marginTop: theme.rem(0.25)
