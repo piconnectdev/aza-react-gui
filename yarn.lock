@@ -7219,10 +7219,9 @@ edge-core-js@^0.19.48:
     yaob "^0.3.9"
     yavent "^0.1.3"
 
-edge-core-js@^1.2.0:
+"edge-core-js@https://github.com/EdgeApp/edge-core-js#throttleYaob":
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/edge-core-js/-/edge-core-js-1.2.0.tgz#5f6fc13feec0287c40534403da13cbb3208a31ef"
-  integrity sha512-2WeX5XrOrooM6uL/cKFJTm4p3SNtHVcDC1n7iOJOBoKlGdEA/PTCSzn8UCaDA73nvsaJCIb/VSalaKFDpX4n9w==
+  resolved "https://github.com/EdgeApp/edge-core-js#5074acb5300a5a709bf71387018e1ac21136b3d7"
   dependencies:
     aes-js "^3.1.0"
     base-x "^4.0.0"
