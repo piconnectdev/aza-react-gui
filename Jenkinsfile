@@ -33,6 +33,10 @@ pipeline {
 
     stage ("Install dependencies") {
       steps {
+        sh "node -v"
+        sh "which node"
+        sh "yarn -v"
+        sh "which yarn"
         sh "yarn"
       }
     }
