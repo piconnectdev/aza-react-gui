@@ -1,5 +1,4 @@
 import childProcess from 'child_process'
-import { asObject, asString } from 'cleaners'
 import fs from 'fs'
 import { join } from 'path'
 import { sprintf } from 'sprintf-js'
@@ -77,16 +76,14 @@ interface BuildObj extends BuildConfigFile {
   ipaFile: string // Also APK
 }
 
-const asLatestTestFile = asObject({
-  platformType: asString,
-  branch: asString,
-  buildNum: asString,
-  version: asString,
-  filePath: asString,
-  gitHash: asString
-})
-
-type LatestTestFile = ReturnType<typeof asLatestTestFile>
+interface LatestTestFile {
+  platformType: string
+  branch: string
+  buildNum: string
+  version: string
+  filePath: string
+  gitHash: string
+}
 
 main()
 
@@ -403,9 +400,8 @@ function buildCommonPost(buildObj: BuildObj) {
     // const rsyncDir = join(buildObj.rsyncLocation, repoBranch, platformType, String(buildNum))
 
     const datePrefix = new Date().toISOString().slice(2, 19).replace(/:/gi, '').replace(/-/gi, '')
-    const fileSuffixArr = buildObj.ipaFile.split('.')
-    const fileSuffix = fileSuffixArr[fileSuffixArr.length - 1]
-    const rsyncFile = escapePath(`${datePrefix}--${productNameClean}--${platformType}--${repoBranch}--${buildNum}--${guiHash.slice(0, 8)}.${fileSuffix}`)
+    const [fileExtension] = buildObj.ipaFile.split('.').reverse()
+    const rsyncFile = escapePath(`${datePrefix}--${productNameClean}--${platformType}--${repoBranch}--${buildNum}--${guiHash.slice(0, 8)}.${fileExtension}`)
 
     // call(`rsync -avz -e "ssh -i ${githubSshKey}" ${buildObj.ipaFile} ${rsyncDir}/`)
     const rsyncFilePath = join(buildObj.rsyncLocation, rsyncFile)
