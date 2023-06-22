@@ -168,6 +168,13 @@ dependencies {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
 
+    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
+    if (hermesEnabled.toBoolean()) {
+        implementation("com.facebook.react:hermes-android")
+    } else {
+        implementation jscFlavor
+    }
+
     // Edge additions:
     implementation "androidx.concurrent:concurrent-futures:1.1.0"
     implementation 'androidx.work:work-runtime:2.7.1'
