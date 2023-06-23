@@ -151,9 +151,11 @@ android {
 
     // Edge hacks for zcash and piratechain conflicts:
     packagingOptions {
-        resources.merges.add("service.proto")
-        resources.merges.add("darkside.proto")
-        resources.merges.add("compact_formats.proto")
+        resources {
+            pickFirst 'compact_formats.proto'
+            pickFirst 'darkside.proto'
+            pickFirst 'service.proto'
+        }
     }
 }
 
