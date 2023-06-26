@@ -547,13 +547,6 @@ const EdgeAppStack = () => {
       <Stack.Screen name="fioStakingChange" component={FioStakingChangeScene} />
       <Stack.Screen name="fioStakingOverview" component={FioStakingOverviewScene} />
       <Stack.Screen
-        name="guiPluginEnterAmount"
-        component={FiatPluginEnterAmountScene}
-        options={{
-          headerRight: () => null
-        }}
-      />
-      <Stack.Screen
         name="guiPluginAddressForm"
         component={AddressFormScene}
         options={{
@@ -668,24 +661,7 @@ const EdgeAppStack = () => {
           headerLeft: () => <PluginBackButton />
         }}
       />
-      <Stack.Screen
-        name="pluginViewBuy"
-        component={GuiPluginViewScene}
-        options={{
-          headerTitle: () => <ParamHeaderTitle<'pluginViewBuy'> fromParams={params => params.plugin.displayName} />,
-          headerRight: () => <HeaderTextButton type="exit" />,
-          headerLeft: () => <PluginBackButton />
-        }}
-      />
-      <Stack.Screen
-        name="pluginViewSell"
-        component={GuiPluginViewScene}
-        options={{
-          headerTitle: () => <ParamHeaderTitle<'pluginViewSell'> fromParams={params => params.plugin.displayName} />,
-          headerRight: () => <HeaderTextButton type="exit" />,
-          headerLeft: () => <PluginBackButton />
-        }}
-      />
+      {renderFiatPluginScenes()}
       <Stack.Screen
         name="promotionSettings"
         component={PromotionSettingsScene}
@@ -793,14 +769,6 @@ const EdgeBuyTabScreen = () => {
   return (
     <Stack.Navigator initialRouteName="pluginListBuy" screenOptions={defaultScreenOptions}>
       <Stack.Screen
-        name="guiPluginEnterAmount"
-        component={FiatPluginEnterAmountScene}
-        options={{
-          headerRight: () => null
-        }}
-      />
-      <Stack.Screen name="pluginListBuy" component={GuiPluginListScene} options={firstSceneScreenOptions} />
-      <Stack.Screen
         name="pluginViewBuy"
         component={GuiPluginViewScene}
         options={{
@@ -809,6 +777,7 @@ const EdgeBuyTabScreen = () => {
           headerLeft: () => <PluginBackButton />
         }}
       />
+      {renderFiatPluginScenes()}
     </Stack.Navigator>
   )
 }
@@ -816,31 +785,8 @@ const EdgeBuyTabScreen = () => {
 const EdgeSellTabScreen = () => {
   return (
     <Stack.Navigator initialRouteName="pluginListSell" screenOptions={defaultScreenOptions}>
-      <Stack.Screen name="guiPluginEnterAmount" component={FiatPluginEnterAmountScene} />
       <Stack.Screen name="pluginListSell" component={GuiPluginListScene} options={firstSceneScreenOptions} />
-      <Stack.Screen
-        name="rewardsCardDashboard"
-        options={{
-          headerTitle: () => <EdgeLogoHeader />
-        }}
-        component={RewardsCardDashboardScene}
-      />
-      <Stack.Screen
-        name="rewardsCardWelcome"
-        options={{
-          headerTitle: () => <EdgeLogoHeader />
-        }}
-        component={RewardsCardWelcomeScene}
-      />
-      <Stack.Screen
-        name="pluginViewSell"
-        component={GuiPluginViewScene}
-        options={{
-          headerTitle: () => <ParamHeaderTitle<'pluginViewSell'> fromParams={params => params.plugin.displayName} />,
-          headerRight: () => <HeaderTextButton type="exit" />,
-          headerLeft: () => <PluginBackButton />
-        }}
-      />
+      {renderFiatPluginScenes()}
     </Stack.Navigator>
   )
 }
@@ -890,5 +836,47 @@ const EdgeMarketsTabScreen = () => {
         }}
       />
     </Stack.Navigator>
+  )
+}
+
+// -----------------------------------------------------------------------------
+// Shared Scenes
+// -----------------------------------------------------------------------------
+
+const renderFiatPluginScenes = () => {
+  return (
+    <>
+      <Stack.Screen name="pluginListBuy" component={GuiPluginListScene} options={firstSceneScreenOptions} />
+      <Stack.Screen
+        name="guiPluginEnterAmount"
+        component={FiatPluginEnterAmountScene}
+        options={{
+          headerRight: () => null
+        }}
+      />
+      <Stack.Screen
+        name="rewardsCardDashboard"
+        options={{
+          headerTitle: () => <EdgeLogoHeader />
+        }}
+        component={RewardsCardDashboardScene}
+      />
+      <Stack.Screen
+        name="rewardsCardWelcome"
+        options={{
+          headerTitle: () => <EdgeLogoHeader />
+        }}
+        component={RewardsCardWelcomeScene}
+      />
+      <Stack.Screen
+        name="pluginViewSell"
+        component={GuiPluginViewScene}
+        options={{
+          headerTitle: () => <ParamHeaderTitle<'pluginViewSell'> fromParams={params => params.plugin.displayName} />,
+          headerRight: () => <HeaderTextButton type="exit" />,
+          headerLeft: () => <PluginBackButton />
+        }}
+      />
+    </>
   )
 }

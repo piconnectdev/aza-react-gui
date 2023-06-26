@@ -114,8 +114,6 @@ export async function handleLink(navigation: NavigationBase, dispatch: Dispatch,
         return true
       }
 
-      navigation.navigate(direction === 'buy' ? 'buyTab' : 'sellTab', {})
-
       await executePlugin({
         account,
         deviceId,
