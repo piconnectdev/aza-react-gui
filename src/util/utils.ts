@@ -297,40 +297,23 @@ export const getYesterdayDateRoundDownHour = () => {
 type AsyncFunction = () => Promise<any>
 
 export async function asyncWaterfall(asyncFuncs: AsyncFunction[], timeoutMs: number = 5000): Promise<any> {
-  let pending = asyncFuncs.length
-  const promises: Array<Promise<any>> = []
-  for (const func of asyncFuncs) {
-    const index = promises.length
-    promises.push(
-      func().catch(e => {
-        e.index = index
-        throw e
-      })
-    )
-    if (pending > 1) {
-      promises.push(
-        new Promise(resolve => {
-          snooze(timeoutMs).then(() => {
-            resolve('async_waterfall_timed_out')
-          })
-        })
-      )
-    }
+  for (let i = 0; i < asyncFuncs.length; ++i) {
+    const func = asyncFuncs[i]
+    const promises: Array<Promise<any>> = [func()]
     try {
-      const result = await Promise.race(promises)
-      if (result === 'async_waterfall_timed_out') {
-        promises.pop()
-        --pending
-      } else {
-        return result
+      // Begin adding a timeout to the race after the first promise
+      if (i > 0) {
+        promises.push(
+          snooze(timeoutMs).then(() => {
+            throw new Error('Asynchronous Timeout')
+          })
+        )
       }
-    } catch (e: any) {
-      const i = e.index
-      promises.splice(i, 1)
-      promises.pop()
-      --pending
-      if (!pending) {
-        throw e
+      return await Promise.race(promises)
+    } catch (err: any) {
+      // Only throw on the last promise
+      if (i === asyncFuncs.length - 1) {
+        throw err
       }
     }
   }
@@ -340,7 +323,7 @@ export async function openLink(url: string): Promise<void> {
   if (Platform.OS === 'ios') {
     try {
       await SafariView.isAvailable()
-      SafariView.show({ url })
+      await SafariView.show({ url })
       return
     } catch (e: any) {
       console.log(e)
@@ -348,7 +331,7 @@ export async function openLink(url: string): Promise<void> {
   }
   const supported = await Linking.canOpenURL(url)
   if (supported) {
-    Linking.openURL(url)
+    await Linking.openURL(url)
   } else {
     throw new Error(`Don't know how to open URI: ${url}`)
   }
