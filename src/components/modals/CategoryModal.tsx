@@ -1,6 +1,6 @@
 import { FlashList, ListRenderItem } from '@shopify/flash-list'
 import * as React from 'react'
-import { TouchableHighlight, View, ViewStyle } from 'react-native'
+import { TouchableHighlight, View } from 'react-native'
 import { AirshipBridge } from 'react-native-airship'
 
 import { getSubcategories, setNewSubcategory } from '../../actions/TransactionDetailsActions'
@@ -14,7 +14,7 @@ import { MinimalButton } from '../buttons/MinimalButton'
 import { cacheStyles, Theme, useTheme } from '../services/ThemeContext'
 import { DividerLine } from '../themed/DividerLine'
 import { EdgeText } from '../themed/EdgeText'
-import { ModalFooter, ModalMessage, ModalTitle } from '../themed/ModalParts'
+import { ModalFooter, ModalTitle } from '../themed/ModalParts'
 import { OutlinedTextInput } from '../themed/OutlinedTextInput'
 import { ThemedModal } from '../themed/ThemedModal'
 
@@ -38,7 +38,7 @@ export function CategoryModal(props: Props) {
   const { bridge, initialCategory } = props
   const dispatch = useDispatch()
   const theme = useTheme()
-  const style = getstyle(theme)
+  const styles = getStyle(theme)
 
   // We split the state into category and subcategory internally:
   const split = splitCategory(initialCategory)
@@ -51,10 +51,6 @@ export function CategoryModal(props: Props) {
   useAsyncEffect(async () => {
     await dispatch(getSubcategories())
   }, [dispatch])
-
-  const scrollPadding = React.useMemo<ViewStyle>(() => {
-    return { paddingBottom: theme.rem(ModalFooter.bottomRem) }
-  }, [theme])
 
   const sortedCategories = React.useMemo(() => {
     // Transform the raw categories into row objects:
@@ -112,28 +108,27 @@ export function CategoryModal(props: Props) {
   const keyExtractor = useHandler((row: CategoryRow) => row.raw)
 
   const renderRow: ListRenderItem<CategoryRow> = useHandler(({ item }) => (
-    <TouchableHighlight delayPressIn={60} style={style.rowContainer} onPress={() => bridge.resolve(item.raw)}>
+    <TouchableHighlight delayPressIn={60} style={styles.rowContainer} onPress={() => bridge.resolve(item.raw)}>
       <>
-        <View style={style.rowContent}>
-          <View style={style.rowCategoryTextWrap}>
-            <EdgeText style={style.rowCategoryText}>{item.display}</EdgeText>
+        <View style={styles.rowContent}>
+          <View style={styles.rowCategoryTextWrap}>
+            <EdgeText style={styles.rowCategoryText}>{item.display}</EdgeText>
           </View>
           {item.new ? (
-            <View style={style.rowPlusWrap}>
-              <EdgeText style={style.rowPlus}>+</EdgeText>
+            <View style={styles.rowPlusWrap}>
+              <EdgeText style={styles.rowPlus}>+</EdgeText>
             </View>
           ) : null}
         </View>
-        <DividerLine marginRem={[0, 1]} />
+        <DividerLine marginRem={[0, 0]} />
       </>
     </TouchableHighlight>
   ))
 
   return (
     <ThemedModal bridge={bridge} onCancel={handleCancel}>
-      <ModalTitle center>{lstrings.transaction_details_category_title}</ModalTitle>
-      <ModalMessage>{lstrings.tx_detail_picker_title}</ModalMessage>
-      <View style={style.inputCategoryRow}>
+      <ModalTitle center>{lstrings.category_modal_title}</ModalTitle>
+      <View style={styles.inputCategoryRow}>
         {categoryOrder.map(item => (
           <MinimalButton key={item} highlighted={category === item} label={displayCategories[item]} onPress={() => setCategory(item)} />
         ))}
@@ -148,7 +143,7 @@ export function CategoryModal(props: Props) {
         value={subcategory}
       />
       <FlashList
-        contentContainerStyle={scrollPadding}
+        contentContainerStyle={styles.scrollPadding}
         data={sortedCategories}
         estimatedItemSize={theme.rem(3)}
         keyboardShouldPersistTaps="handled"
@@ -163,7 +158,7 @@ export function CategoryModal(props: Props) {
 // This is the order we display the categories in:
 const categoryOrder: Category[] = ['income', 'expense', 'transfer', 'exchange']
 
-const getstyle = cacheStyles((theme: Theme) => ({
+const getStyle = cacheStyles((theme: Theme) => ({
   inputCategoryRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -195,5 +190,8 @@ const getstyle = cacheStyles((theme: Theme) => ({
   },
   rowPlus: {
     fontSize: theme.rem(0.95)
+  },
+  scrollPadding: {
+    paddingBottom: theme.rem(ModalFooter.bottomRem)
   }
 }))
