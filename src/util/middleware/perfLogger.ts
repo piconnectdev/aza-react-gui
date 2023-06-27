@@ -13,7 +13,7 @@ export const perfLogger: Middleware<{}, RootState, Dispatch> = store => next => 
   const result = next(action)
   const end = Date.now()
 
-  RNFS.appendFile(perfLoggerCSV, `${action.type},${start},${end}\n`)
+  RNFS.appendFile(perfLoggerCSV, `${action.type},${start},${end}\n`).catch(err => console.error(err))
 
   return result
 }
