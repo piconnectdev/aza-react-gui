@@ -344,33 +344,52 @@ Array [
       >
         
       </Text>
-      <TextInput
-        autoFocus={false}
-        editable={true}
-        multiline={false}
-        onBlur={[Function]}
-        onChangeText={[Function]}
-        onFocus={[Function]}
-        returnKeyType="search"
-        secureTextEntry={false}
-        selectionColor="#FFFFFF"
+      <View
         style={
           Array [
             Object {
-              "alignSelf": "stretch",
-              "color": "#FFFFFF",
-              "fontFamily": "Quicksand-Regular",
-              "fontSize": 22,
-              "padding": 0,
+              "flexDirection": "row",
+              "justifyContent": "flex-start",
             },
             Object {
-              "flexGrow": 0,
+              "paddingRight": 65,
             },
           ]
         }
-        textAlignVertical="top"
-        value=""
-      />
+      >
+        <TextInput
+          accessibilityState={
+            Object {
+              "disabled": false,
+            }
+          }
+          autoFocus={false}
+          editable={true}
+          multiline={false}
+          onBlur={[Function]}
+          onChangeText={[Function]}
+          onFocus={[Function]}
+          returnKeyType="search"
+          secureTextEntry={false}
+          selectionColor="#FFFFFF"
+          style={
+            Array [
+              Object {
+                "alignSelf": "stretch",
+                "color": "#FFFFFF",
+                "fontFamily": "Quicksand-Regular",
+                "fontSize": 22,
+                "padding": 0,
+              },
+              Object {
+                "flexGrow": 0,
+              },
+            ]
+          }
+          textAlignVertical="top"
+          value=""
+        />
+      </View>
     </View>
     <View
       style={

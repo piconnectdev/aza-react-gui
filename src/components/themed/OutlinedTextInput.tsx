@@ -361,53 +361,52 @@ export const OutlinedTextInput = React.forwardRef<OutlinedTextInputRef, Outlined
             </View>
           </TouchableWithoutFeedback>
         ) : null}
-        {
-          <View style={[styles.suffixContainer, suffixPadding]}>
-            {prefix != null ? <Animated.Text style={[textStyle, prefixStyle]}>{`${prefix} `}</Animated.Text> : null}
-            {numeric ? (
-              <NumericInput
-                ref={inputRef}
-                {...inputProps}
-                accessibilityState={{ disabled }}
-                minDecimals={minDecimals}
-                maxDecimals={maxDecimals}
-                autoFocus={autoFocus}
-                multiline={multiline}
-                editable={!showSpinner}
-                selectionColor={hasError ? theme.dangerText : theme.outlineTextInputTextColor}
-                style={[textStyle, textInputStyle]}
-                textAlignVertical="top"
-                value={value}
-                secureTextEntry={hidePassword}
-                // Callbacks:
-                onBlur={handleBlur}
-                onChangeText={onChangeText}
-                onFocus={handleFocus}
-                maxLength={maxLength}
-              />
-            ) : (
-              <TextInput
-                ref={inputRef}
-                {...inputProps}
-                accessibilityState={{ disabled }}
-                autoFocus={autoFocus}
-                multiline={multiline}
-                editable={!showSpinner}
-                selectionColor={hasError ? theme.dangerText : theme.outlineTextInputTextColor}
-                style={[textStyle, textInputStyle]}
-                textAlignVertical="top"
-                value={value}
-                secureTextEntry={hidePassword}
-                // Callbacks:
-                onBlur={handleBlur}
-                onChangeText={onChangeText}
-                onFocus={handleFocus}
-                maxLength={maxLength}
-              />
-            )}
-            {suffix != null ? <EdgeText style={suffixStyle}>{suffix}</EdgeText> : null}
-          </View>
-        }
+
+        <View style={[styles.suffixContainer, suffixPadding]}>
+          {prefix != null ? <Animated.Text style={[textStyle, prefixStyle]}>{`${prefix} `}</Animated.Text> : null}
+          {numeric ? (
+            <NumericInput
+              ref={inputRef}
+              {...inputProps}
+              accessibilityState={{ disabled }}
+              minDecimals={minDecimals}
+              maxDecimals={maxDecimals}
+              autoFocus={autoFocus}
+              multiline={multiline}
+              editable={!showSpinner}
+              selectionColor={hasError ? theme.dangerText : theme.outlineTextInputTextColor}
+              style={[textStyle, textInputStyle]}
+              textAlignVertical="top"
+              value={value}
+              secureTextEntry={hidePassword}
+              // Callbacks:
+              onBlur={handleBlur}
+              onChangeText={onChangeText}
+              onFocus={handleFocus}
+              maxLength={maxLength}
+            />
+          ) : (
+            <TextInput
+              ref={inputRef}
+              {...inputProps}
+              accessibilityState={{ disabled }}
+              autoFocus={autoFocus}
+              multiline={multiline}
+              editable={!showSpinner}
+              selectionColor={hasError ? theme.dangerText : theme.outlineTextInputTextColor}
+              style={[textStyle, textInputStyle]}
+              textAlignVertical="top"
+              value={value}
+              secureTextEntry={hidePassword}
+              // Callbacks:
+              onBlur={handleBlur}
+              onChangeText={onChangeText}
+              onFocus={handleFocus}
+              maxLength={maxLength}
+            />
+          )}
+          {suffix != null ? <EdgeText style={suffixStyle}>{suffix}</EdgeText> : null}
+        </View>
       </View>
     </TouchableWithoutFeedback>
   )
