@@ -8,6 +8,7 @@ import { sprintf } from 'sprintf-js'
 import { walletListMenuAction, WalletListMenuKey } from '../../actions/WalletListMenuActions'
 import { getSpecialCurrencyInfo } from '../../constants/WalletAndCurrencyConstants'
 import { useAsyncEffect } from '../../hooks/useAsyncEffect'
+import { useHandler } from '../../hooks/useHandler'
 import { useWatch } from '../../hooks/useWatch'
 import { lstrings } from '../../locales/strings'
 import { useDispatch, useSelector } from '../../types/reactRedux'
@@ -135,10 +136,14 @@ export function WalletListMenuModal(props: Props) {
 
   const handleCancel = () => props.bridge.resolve()
 
-  const optionAction = (option: WalletListMenuKey) => {
-    dispatch(walletListMenuAction(navigation, walletId, option, tokenId))
-    bridge.resolve()
-  }
+  const optionAction = useHandler(async (option: WalletListMenuKey) => {
+    try {
+      await dispatch(walletListMenuAction(navigation, walletId, option, tokenId))
+      bridge.resolve()
+    } catch (error: any) {
+      bridge.reject(error)
+    }
+  })
 
   useAsyncEffect(async () => {
     if (wallet == null) {
@@ -218,7 +223,7 @@ export function WalletListMenuModal(props: Props) {
       <View style={styles.scrollViewContainer}>
         <ScrollView contentContainerStyle={styles.scrollViewPadding}>
           {options.map((option: Option) => (
-            <TouchableOpacity key={option.value} onPress={() => optionAction(option.value)} style={styles.row}>
+            <TouchableOpacity key={option.value} onPress={async () => await optionAction(option.value)} style={styles.row}>
               <AntDesignIcon
                 // @ts-expect-error
                 name={icons[option.value] ?? 'arrowsalt'} // for split keys like splitBCH, splitETH, etc.
