@@ -5,7 +5,6 @@ import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack'
 import * as React from 'react'
 import { AirshipToast } from 'react-native-airship'
-import { useDispatch } from 'react-redux'
 
 import { checkEnabledExchanges } from '../actions/CryptoExchangeActions'
 import { logout } from '../actions/LoginActions'
@@ -22,7 +21,7 @@ import { RewardsCardDashboardScene as RewardsCardListSceneComponent } from '../p
 import { RewardsCardWelcomeScene as RewardsCardWelcomeSceneComponent } from '../plugins/gui/scenes/RewardsCardWelcomeScene'
 import { SepaFormScene } from '../plugins/gui/scenes/SepaFormScene'
 import { defaultAccount } from '../reducers/CoreReducer'
-import { useSelector } from '../types/reactRedux'
+import { useDispatch, useSelector } from '../types/reactRedux'
 import { AppParamList } from '../types/routerTypes'
 import { logEvent } from '../util/tracking'
 import { ifLoggedIn } from './hoc/IfLoggedIn'
@@ -263,9 +262,11 @@ const EdgeApp = () => {
       return true
     }
     backPressedOnce.current = true
-    Airship.show(bridge => <AirshipToast bridge={bridge} message={lstrings.back_button_tap_again_to_exit} />).then(() => {
-      backPressedOnce.current = false
-    })
+    Airship.show(bridge => <AirshipToast bridge={bridge} message={lstrings.back_button_tap_again_to_exit} />)
+      .then(() => {
+        backPressedOnce.current = false
+      })
+      .catch(err => console.error(err))
     // Timeout the back press after 3 seconds so the state isn't "sticky"
     setTimeout(() => {
       backPressedOnce.current = false
@@ -278,7 +279,7 @@ const EdgeApp = () => {
     dispatch({ type: 'IS_LOGGED_IN' })
   })
   useUnmount(() => {
-    dispatch(logout())
+    dispatch(logout()).catch(err => console.error(err))
   })
 
   return (
@@ -711,7 +712,9 @@ const EdgeAppStack = () => {
           title: lstrings.title_settings
         }}
         listeners={{
-          focus: () => dispatch(showReEnableOtpModal())
+          focus: () => {
+            dispatch(showReEnableOtpModal()).catch(err => console.warn(err))
+          }
         }}
       />
       <Stack.Screen
