@@ -53,10 +53,8 @@ export const ScanModal = (props: Props) => {
   // Mount effects
   React.useEffect(() => {
     setScanEnabled(true)
-    edgeRequestPermission('camera')
-
+    edgeRequestPermission('camera').catch(err => showError(err))
     return () => setScanEnabled(false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleBarCodeRead = (result: { data: string }) => {
@@ -64,9 +62,9 @@ export const ScanModal = (props: Props) => {
     bridge.resolve(result.data)
   }
 
-  const handleSettings = () => {
+  const handleSettings = async () => {
     triggerHaptic('impactLight')
-    Linking.openSettings()
+    await Linking.openSettings()
   }
 
   const handleTextInput = async () => {
