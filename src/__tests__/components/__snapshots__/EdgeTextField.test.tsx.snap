@@ -2,7 +2,6 @@
 
 exports[`EdgeTextField should render with loading props 1`] = `
 <TextField
-  activeLineWidth={2}
   animationDuration={225}
   autoCapitalize="sentences"
   baseColor="#FFFFFF"
@@ -17,15 +16,16 @@ exports[`EdgeTextField should render with loading props 1`] = `
   disableFullscreenUI={true}
   disabled={false}
   disabledLineType="dotted"
-  disabledLineWidth={1}
   editable={true}
   errorColor="#E85466"
   fontSize={16}
+  inputContainerPadding={8}
   labelFontSize={12}
-  lineType="solid"
-  lineWidth={1}
+  labelHeight={32}
+  labelPadding={4}
   textColor="#FFFFFF"
   tintColor="#FFFFFF"
+  titleFontSize={12}
   underlineColorAndroid="transparent"
 />
 `;

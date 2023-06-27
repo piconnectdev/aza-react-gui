@@ -85,14 +85,30 @@ exports[`CreateWalletAccountSelect should render with loading props 1`] = `
           }
         }
       >
-        <ForwardRef
+        <FormField
+          autoCapitalize="none"
           autoCorrect={false}
           autoFocus={true}
+          baseColor="#0D2145"
+          containerStyle={
+            Object {
+              "height": 60,
+              "marginBottom": 33.709859154929575,
+              "marginTop": 22.473239436619718,
+              "position": "relative",
+              "width": 658.7024647887324,
+            }
+          }
           error=""
+          errorColor="#E85466"
+          keyboardType="default"
           label="Account Handle"
           onChangeText={[Function]}
           onSubmitEditing={[Function]}
           returnKeyType="next"
+          textColor="#25292C"
+          tintColor="#0E4B75"
+          titleTextStyle={Object {}}
           value=""
         />
         <View
