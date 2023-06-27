@@ -615,7 +615,7 @@ const strings = {
   transaction_details_show_advanced_block_explorer: 'Show in Block Explorer',
   transaction_history_permission: 'Would you like to share the entire transaction history of %s with this partner?',
   transaction_details_error_invalid: 'Invalid Transaction',
-  transaction_details_choose_a_sub_category: 'Choose a sub-category',
+  sub_category_label: 'Sub-category',
   transaction_details_recipient_addresses: 'Recipient Addresses',
   transaction_details_advance_details_header: 'Advanced Details',
   transaction_details_advance_details_fee_setting: 'Fee Setting',
