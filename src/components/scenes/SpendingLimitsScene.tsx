@@ -1,19 +1,18 @@
 import * as React from 'react'
-import { Switch, View } from 'react-native'
+import { Alert, Switch, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { setSpendingLimits } from '../../actions/SpendingLimitsActions'
 import { getSymbolFromCurrency } from '../../constants/WalletAndCurrencyConstants'
 import { useHandler } from '../../hooks/useHandler'
 import { lstrings } from '../../locales/strings'
-import { THEME } from '../../theme/variables/airbitz'
+import { setSpendingLimits } from '../../modules/Core/Account/settings'
 import { useDispatch, useSelector } from '../../types/reactRedux'
 import { EdgeSceneProps } from '../../types/routerTypes'
 import { zeroString } from '../../util/utils'
 import { SceneWrapper } from '../common/SceneWrapper'
-import { cacheStyles, Theme, useTheme } from '../services/ThemeContext'
+import { PrimaryButton } from '../legacy/Buttons/PrimaryButton.ui'
 import { FormattedText } from '../legacy/FormattedText/FormattedText.ui'
-import { cacheStyles, useTheme } from '../services/ThemeContext'
+import { cacheStyles, Theme, useTheme } from '../services/ThemeContext'
 import { OutlinedTextInput } from '../themed/OutlinedTextInput'
 
 interface Props extends EdgeSceneProps<'spendingLimits'> {}
@@ -24,6 +23,7 @@ export const SpendingLimitsScene = (props: Props) => {
   const styles = getStyles(theme)
   const dispatch = useDispatch()
 
+  const account = useSelector(state => state.core.account)
   const currencySymbol = useSelector(state => getSymbolFromCurrency(state.ui.settings.defaultFiat))
   const transactionSpendingLimit = useSelector(state => state.ui.settings.spendingLimits.transaction)
 
@@ -34,32 +34,29 @@ export const SpendingLimitsScene = (props: Props) => {
   const [transactionIsEnabled, setTransactionIsEnabled] = React.useState(transactionSpendingLimit.isEnabled)
 
   const handleTransactionIsEnabledChanged = useHandler(() => setTransactionIsEnabled(!transactionIsEnabled))
-  const handleTransactionAmountChanged = useHandler((transactionAmount: string) => {
-    setTransactionAmount(transactionAmount)
-  })
-  const handlePasswordChanged = useHandler((password: string) => {
-    setPassword(password)
-  })
 
-  const handleSubmit = () => {
-    dispatch(
-      setSpendingLimits(
-        navigation,
-        {
-          transaction: {
-            isEnabled: transactionIsEnabled,
-            amount: parseFloat(transactionAmount)
-          }
-        },
-        password
-      )
-    )
+  const handleSubmit = async () => {
+    const isAuthorized = await account.checkPassword(password)
+    if (!isAuthorized) return Alert.alert(lstrings.password_check_incorrect_password_title)
+
+    const spendingLimits = {
+      transaction: {
+        isEnabled: transactionIsEnabled,
+        amount: parseFloat(transactionAmount)
+      }
+    }
+    await setSpendingLimits(account, spendingLimits)
+    dispatch({
+      type: 'SPENDING_LIMITS/NEW_SPENDING_LIMITS',
+      data: { spendingLimits }
+    })
+    navigation.pop()
   }
 
   return (
     <SceneWrapper background="legacy" hasHeader>
       <KeyboardAwareScrollView contentContainerStyle={styles.scene}>
-        <OutlinedTextInput secureTextEntry autoFocus label={lstrings.enter_your_password} value={password} onChangeText={handlePasswordChanged} />
+        <OutlinedTextInput secureTextEntry autoFocus label={lstrings.enter_your_password} value={password} onChangeText={setPassword} />
 
         <View style={styles.switchRow}>
           <View style={styles.textBlock}>
@@ -72,7 +69,7 @@ export const SpendingLimitsScene = (props: Props) => {
         <OutlinedTextInput
           disabled={!transactionIsEnabled}
           value={transactionAmount}
-          onChangeText={handleTransactionAmountChanged}
+          onChangeText={setTransactionAmount}
           label={lstrings.spending_limits_tx_title}
           autoCorrect={false}
           autoFocus={false}
